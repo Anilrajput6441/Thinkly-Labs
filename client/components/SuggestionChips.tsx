@@ -1,17 +1,11 @@
 "use client";
 
 type Props = {
+  suggestions: string[];
   onSelect: (text: string) => void;
 };
 
-const suggestions = [
-  "Rewrite this ad",
-  "Make it more catchy",
-  "Add urgency",
-  "Improve headline",
-];
-
-export default function SuggestionChips({ onSelect }: Props) {
+export default function SuggestionChips({ suggestions, onSelect }: Props) {
   return (
     <div className="flex flex-wrap gap-2 mt-2">
       {suggestions.map((item, i) => (

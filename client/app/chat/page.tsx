@@ -6,6 +6,7 @@ import { useEffect, useState, useRef } from "react";
 type Message = {
   role: "user" | "assistant";
   content: string;
+  suggestions?: string[];
 };
 
 export default function ChatPage() {
@@ -63,12 +64,12 @@ export default function ChatPage() {
 
       setMessages([
         ...newMessages,
-        { role: "assistant" as const, content: data.reply },
+        { role: "assistant" as const, content: data.reply, suggestions: data.suggestions || [] },
       ]);
     } catch (err) {
       setMessages([
         ...newMessages,
-        { role: "assistant" as const, content: "Something went wrong" },
+        { role: "assistant" as const, content: "Something went wrong", suggestions: [] },
       ]);
     } finally {
       setLoading(false);
@@ -97,9 +98,25 @@ export default function ChatPage() {
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.length === 0 && (
-          <p className="text-gray-500">
-            No messages yet. Start by asking something 👇
-          </p>
+          <div className="text-center text-gray-500 mt-10">
+            <p className="mb-4">Start by pasting your ad copy</p>
+
+            <div className="flex flex-wrap justify-center gap-2">
+              <button
+                onClick={() => sendMessage("Analyze my ad copy")}
+                className="px-3 py-1 bg-white/10 rounded-full"
+              >
+                Analyze Ad
+              </button>
+
+              <button
+                onClick={() => sendMessage("Improve CTR")}
+                className="px-3 py-1 bg-white/10 rounded-full"
+              >
+                Improve CTR
+              </button>
+            </div>
+          </div>
         )}
 
         {messages.map((msg, i) => (
@@ -107,8 +124,8 @@ export default function ChatPage() {
             <div
               className={`relative max-w-xl p-3 rounded-xl ${
                 msg.role === "user"
-                  ? "bg-gradient-to-r from-orange-500 via-pink-500 to-purple-500 ml-auto"
-                  : "bg-white/10"
+                  ? "bg-gradient-to-r from-orange-500 via-pink-500 to-purple-500 ml-auto text-white shadow-lg"
+                  : "bg-white/10 backdrop-blur shadow-md"
               }`}
             >
               <div className="whitespace-pre-wrap">{msg.content}</div>
@@ -125,8 +142,8 @@ export default function ChatPage() {
                 </button>
               )}
             </div>
-            {msg.role === "assistant" && i === messages.length - 1 && (
-              <SuggestionChips onSelect={(text) => sendMessage(text)} />
+            {msg.role === "assistant" && i === messages.length - 1 && msg.suggestions && msg.suggestions.length > 0 && (
+              <SuggestionChips suggestions={msg.suggestions} onSelect={(text) => sendMessage(text)} />
             )}
           </div>
         ))}

@@ -11,5 +11,14 @@ Rules:
 - Use bullet points
 - Give examples when possible
 - Avoid generic advice
-- Sound like a helpful marketing mentor
+
+Also:
+After every response, provide 3 short follow-up suggestions the user can click.
+
+Respond ONLY in this JSON format:
+
+{
+  "reply": "your main answer here",
+  "suggestions": ["suggestion 1", "suggestion 2", "suggestion 3"]
+}
 `;
