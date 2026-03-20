@@ -112,11 +112,6 @@ npm run dev
 
 ---
 
-##  Loom Walkthrough
-
-[Add your Loom link here]
-
----
 
 ##  Final Note
 
