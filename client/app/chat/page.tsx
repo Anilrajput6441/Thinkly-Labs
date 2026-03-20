@@ -1,5 +1,6 @@
 "use client";
 
+import SuggestionChips from "@/components/SuggestionChips";
 import { useEffect, useState, useRef } from "react";
 
 type Message = {
@@ -11,6 +12,7 @@ export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
 
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
@@ -81,8 +83,10 @@ export default function ChatPage() {
 
         <button
           onClick={() => {
-            setMessages([]);
-            localStorage.removeItem(STORAGE_KEY);
+            if (confirm("Clear all chat?")) {
+              setMessages([]);
+              localStorage.removeItem(STORAGE_KEY);
+            }
           }}
           className="text-sm text-red-400 hover:text-red-300"
         >
@@ -99,15 +103,31 @@ export default function ChatPage() {
         )}
 
         {messages.map((msg, i) => (
-          <div
-            key={i}
-            className={`max-w-xl p-3 rounded-xl ${
-              msg.role === "user"
-                ? "bg-gradient-to-r from-orange-500 via-pink-500 to-purple-500 ml-auto"
-                : "bg-white/10"
-            }`}
-          >
-            {msg.content}
+          <div key={i}>
+            <div
+              className={`relative max-w-xl p-3 rounded-xl ${
+                msg.role === "user"
+                  ? "bg-gradient-to-r from-orange-500 via-pink-500 to-purple-500 ml-auto"
+                  : "bg-white/10"
+              }`}
+            >
+              <div className="whitespace-pre-wrap">{msg.content}</div>
+              {msg.role === "assistant" && (
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(msg.content);
+                    setCopiedIndex(i);
+                    setTimeout(() => setCopiedIndex(null), 2000);
+                  }}
+                  className="absolute top-2 right-2 border p-0.5 cursor-pointer rounded-lg text-xs text-gray-400 hover:text-white"
+                >
+                  {copiedIndex === i ? "Copied!" : "Copy"}
+                </button>
+              )}
+            </div>
+            {msg.role === "assistant" && i === messages.length - 1 && (
+              <SuggestionChips onSelect={(text) => sendMessage(text)} />
+            )}
           </div>
         ))}
 
@@ -116,9 +136,9 @@ export default function ChatPage() {
             AdMentor is analyzing...
           </div>
         )}
+        {/*for referencing the bottom of the chat to auto-scroll */}
+        <div ref={bottomRef} />
       </div>
-      {/*for referencing the bottom of the chat to auto-scroll */}
-      <div ref={bottomRef} />
 
       {/* Input */}
       <div className="p-4 border-t border-white/10 flex gap-2">
